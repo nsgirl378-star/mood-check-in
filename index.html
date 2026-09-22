@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Check-In</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f3f0f5;
+    color: #30343b;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: min(850px, 100%);
+    background: white;
+    border-radius: 12px;
+    padding: 34px;
+    box-shadow: 0 4px 16px rgba(50,50,70,.10);
+    border: 1px solid #ddd8e3;
+    text-align: center;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #77708b;
+    margin-bottom: 10px;
+  }
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(30px, 5vw, 44px);
+    color: #5d526d;
+  }
+  .intro {
+    font-size: 18px;
+    margin: 0 auto 30px;
+    max-width: 650px;
+    line-height: 1.5;
+    color: #555b63;
+  }
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin: 28px 0;
+  }
+  button {
+    border: 2px solid #d8d2dc;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 8px;
+    min-height: 105px;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: 700;
+    color: #484354;
+    transition: background .15s, border-color .15s;
+  }
+  button:hover {
+    background: #f3eef7;
+    border-color: #a99ab8;
+  }
+  .emoji { display:block; font-size: 34px; margin-bottom: 8px; }
+  .tip {
+    display: none;
+    margin-top: 28px;
+    padding: 28px;
+    border-radius: 12px;
+    background: #f6f7f6;
+    border-left: 5px solid #9b8aab;
+    text-align: left;
+  }
+  .tip.show { display:block; animation: fade .25s ease-in; }
+  @keyframes fade { from {opacity:0; transform:translateY(8px)} to {opacity:1; transform:none} }
+  .tip h2 { margin:0 0 10px; color:#5d526d; font-size:24px; }
+  .tip p { font-size:19px; line-height:1.55; margin: 0 0 12px; }
+  .source { font-size:13px !important; color:#69716e; }
+  .again {
+    display:none;
+    margin:18px auto 0;
+    border:0;
+    background:#6b5b78;
+    color:white;
+    min-height:auto;
+    padding:12px 22px;
+    border-radius:12px;
+  }
+  .note {
+    margin-top:25px;
+    font-size:13px;
+    color:#777;
+    line-height:1.45;
+  }
+  @media (max-width: 700px) {
+    .card { padding:28px 18px; }
+    .buttons { grid-template-columns: 1fr 1fr; }
+    button:last-child { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="eyebrow">Mental Health Fair • Mood Check-In</div>
+  <h1>How are you feeling today?</h1>
+  <p class="intro">There is no right or wrong answer. Just choose the one that feels closest to you right now.</p>
+
+  <div class="buttons">
+    <button onclick="showTip('great')"><span class="emoji">🌿</span>Great</button>
+    <button onclick="showTip('okay')"><span class="emoji">🙂</span>Okay</button>
+    <button onclick="showTip('meh')"><span class="emoji">😐</span>Meh</button>
+    <button onclick="showTip('low')"><span class="emoji">🌧️</span>Low</button>
+    <button onclick="showTip('reallylow')"><span class="emoji">💙</span>Really low</button>
+  </div>
+
+  <section id="tip" class="tip" aria-live="polite">
+    <h2 id="tipTitle"></h2>
+    <p id="tipText"></p>
+    <p id="tipSource" class="source"></p>
+  </section>
+
+  <button id="again" class="again" onclick="resetCheckIn()">Check in again</button>
+
+  <div class="note">
+    This is a quick check-in for education and reflection—not a diagnosis. If you are worried about your mental health,
+    consider talking with a health-care professional or someone you trust.
+    <br><br>
+    <strong>Nancy Boudreau • Madison Drummond • Robyn Walsh</strong><br>
+    NSCC Pictou Campus Practical Nursing Students<br>
+    Mental Health Fair
+  </div>
+</main>
+
+<script>
+const tips = {
+  great: {
+    title: "Keep doing what supports your well-being.",
+    text: "Positive mental health is supported by healthy relationships, meaningful activities, physical activity, sleep, and realistic goals. Keep noticing what helps you feel well.",
+    source: "Evidence base: Public Health Agency of Canada, “About mental health” and “Protective and risk factors for mental health.”"
+  },
+  okay: {
+    title: "Small actions can help maintain your mood.",
+    text: "Staying connected with supportive people and keeping healthy routines can protect mental health. You do not need to wait until you feel bad to take care of your mental health.",
+    source: "Evidence base: Public Health Agency of Canada; CMHA Nova Scotia, Depression."
+  },
+  meh: {
+    title: "Try one small, manageable activity.",
+    text: "Behavioural activation is used in depression care: scheduling manageable activities and gradually increasing engagement can help. Even a short walk, a shower, a favourite activity, or connecting with someone can be a starting point.",
+    source: "Evidence base: CAMH, Evidence Based Treatment of Depression; Canada.ca, evidence-based recommendations for physical activity and depression."
+  },
+  low: {
+    title: "You do not have to handle a low mood alone.",
+    text: "Depression can make people want to withdraw, but social support can be protective. Consider reaching out to someone you trust, and consider speaking with a health-care professional if low mood is persistent or affecting daily life.",
+    source: "Evidence base: CAMH, Depression: An information guide; Public Health Agency of Canada, Protective and risk factors for mental health."
+  },
+  reallylow: {
+    title: "Reaching out is a strength.",
+    text: "If you are feeling really low, connect with someone you trust and consider professional support. If you are having thoughts of suicide or are worried about someone else, call or text 9-8-8 in Canada, available 24/7.",
+    source: "Evidence base: CMHA Nova Scotia, Depression; CAMH, Depression."
+  }
+};
+
+const alternateTips = {
+  great: [
+    {
+      title: "Protect the good days.",
+      text: "Keeping a regular sleep routine, staying connected, and making time for activities you enjoy can support mental well-being.",
+      source: "Evidence base: Public Health Agency of Canada, mental health protective factors."
+    },
+    {
+      title: "Notice what is working.",
+      text: "Think about one thing that helped you feel good today. Recognizing helpful routines can make them easier to repeat.",
+      source: "Evidence base: Public Health Agency of Canada, mental health protective factors."
+    }
+  ],
+  okay: [
+    {
+      title: "A little support can go a long way.",
+      text: "Maintaining social connections and regular daily routines can support mental health, even when you are feeling okay.",
+      source: "Evidence base: Public Health Agency of Canada, mental health protective factors."
+    },
+    {
+      title: "Check in with yourself.",
+      text: "A quick mood check can help you notice changes early. Consider what you need today: rest, connection, movement, or something enjoyable.",
+      source: "Evidence base: Public Health Agency of Canada, mental health promotion information."
+    }
+  ],
+  meh: [
+    {
+      title: "Start small.",
+      text: "When motivation is low, choose one small activity you can realistically complete. Small steps can help increase engagement with everyday life.",
+      source: "Evidence base: CAMH, evidence-based treatment of depression."
+    },
+    {
+      title: "Try changing your surroundings.",
+      text: "A short walk, getting outside, listening to music, or connecting with someone can be a simple first step when you feel stuck.",
+      source: "Evidence base: CAMH; Public Health Agency of Canada."
+    }
+  ],
+  low: [
+    {
+      title: "Connection matters.",
+      text: "Let someone you trust know how you are feeling. Social support can be an important protective factor for mental health.",
+      source: "Evidence base: Public Health Agency of Canada, protective and risk factors for mental health."
+    },
+    {
+      title: "Give yourself one doable goal.",
+      text: "Depression can affect energy and motivation. Breaking an activity into a small, manageable step can make it easier to get started.",
+      source: "Evidence base: CAMH, evidence-based treatment of depression."
+    }
+  ],
+  reallylow: [
+    {
+      title: "You deserve support.",
+      text: "If you are feeling really low, reach out to someone you trust or a health-care professional. You do not have to manage this by yourself.",
+      source: "Evidence base: CAMH, depression information; CMHA Nova Scotia."
+    },
+    {
+      title: "Need immediate help?",
+      text: "If you are having thoughts of suicide or are worried about someone else, call or text 9-8-8 in Canada. It is available 24/7.",
+      source: "Evidence base: Canada’s 9-8-8 Suicide Crisis Helpline; CMHA Nova Scotia."
+    }
+  ]
+};
+
+function showTip(mood) {
+  const choices = [tips[mood], ...alternateTips[mood]];
+  const t = choices[Math.floor(Math.random() * choices.length)];
+  document.getElementById('tipTitle').textContent = t.title;
+  document.getElementById('tipText').textContent = t.text;
+  document.getElementById('tipSource').textContent = t.source;
+  document.getElementById('tip').classList.add('show');
+  document.getElementById('again').style.display = 'block';
+  document.getElementById('tip').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function resetCheckIn() {
+  document.getElementById('tip').classList.remove('show');
+  document.getElementById('again').style.display = 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
